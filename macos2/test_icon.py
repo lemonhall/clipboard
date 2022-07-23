@@ -195,12 +195,12 @@ def if_diff():
 
 # 这个是主逻辑，从自己的mac程序test_checker2.py里面抄出来的，以后可以包装一个类，兼容三端
 def checker():
-    print("Hello World~~~")
+    print("本地剪切板轮训检查开始")
     #get a bytes,convert it to string
     #https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
-    print("====Type of paste====")
-    print(type(pyclip.paste()))
-    if not isinstance(pyclip.paste(), int):
+    try:
+        print("====Type of paste====")
+        print(type(pyclip.paste()))
         content = pyclip.paste().decode("utf-8")
         content = content.replace("\r\n","\n")
         print("I am in checker begging.....3 lines, I print out pyperclip.paste()'s result")
@@ -222,8 +222,10 @@ def checker():
             Fact = remote_clip_content
             T.delete("1.0", "end")  # if you want to remove the old data
             T.insert(END,Fact)
-    else:
-        print("not a text pasted, pass ")
+    except Exception as e:
+            print(f"[!] 剪切板解码失败: {e}")
+            pyclip.copy("")
+            print("那还能咋整，清空剪切板得了")
 
 # task that runs at a fixed interval
 def background_task(interval_sec):
