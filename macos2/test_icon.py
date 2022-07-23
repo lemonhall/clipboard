@@ -64,6 +64,11 @@ http_server_url = ""
 # Create an instance of tkinter frame or window
 win=Tk()
 
+#Fatal Python error: PyEval_RestoreThread: NULL tstate
+#为了解决这个错误，加入的状态项
+hide_window_status = False
+hide_window_clipboard_cache = ""
+
 win.title("共享剪贴板程序")
 # Set the size of the window
 win.geometry("700x350")
@@ -76,11 +81,24 @@ def quit_window(icon, item):
 
 # Define a function to show the window again
 def show_window(icon, item):
-   icon.stop()
-   win.after(0,win.deiconify())
+    global hide_window_status
+    global hide_window_clipboard_cache
+    hide_window_status = False
+    icon.stop()
+    win.after(0,win.deiconify())
+    #窗口回复之后马上就更新一下剪贴板的内容
+    Fact = hide_window_clipboard_cache
+    T.delete("1.0", "end")  # if you want to remove the old data
+    T.insert(END,Fact)
 
 # Hide the window and show on the system taskbar
 def hide_window():
+    global hide_window_status
+    print("你看见的hide_window_status的状态是？：")
+    print(hide_window_status)
+    hide_window_status = True
+    print("我改了一下，你再看看呢？")
+    print(hide_window_status)
     win.withdraw()
     #win.iconify()
     image=Image.open(resource_path("favicon.ico"))
@@ -219,9 +237,19 @@ def checker():
         else:
             print("更新本地剪切板")
             pyclip.copy(remote_clip_content)
-            Fact = remote_clip_content
-            T.delete("1.0", "end")  # if you want to remove the old data
-            T.insert(END,Fact)
+            #Fatal Python error: PyEval_RestoreThread: NULL tstate
+            #为了解决这个错误，加入的状态项
+            global hide_window_status
+            global hide_window_clipboard_cache
+            print("==当前窗口是否为隐藏==:")
+            print(hide_window_status)
+            if hide_window_status:
+                #在窗口不可见的期间，把内容存入到cache里
+                hide_window_clipboard_cache = remote_clip_content
+            else:
+                Fact = remote_clip_content
+                T.delete("1.0", "end")  # if you want to remove the old data
+                T.insert(END,Fact)
     except Exception as e:
             print(f"[!] 剪切板解码失败: {e}")
             pyclip.copy("")
@@ -263,7 +291,7 @@ http_server_url = init_server_address()
 #pyperclip.copy('The text to be copied to the clipboard.')
 # create and start the daemon thread
 print('Starting background task...')
-daemon = Thread(target=background_task, args=(1,), daemon=True, name='Background')
+daemon = Thread(target=background_task, args=(2,), daemon=True, name='Background')
 daemon.start()
 
 #挺好使，这个设置图标的管用
