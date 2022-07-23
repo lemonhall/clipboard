@@ -1,0 +1,3 @@
+win.title("共享剪贴板程序")
+# Set the size of the window
+win.geometry("700x350")
