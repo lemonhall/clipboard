@@ -131,10 +131,12 @@ def post_to_server(content):
     #这里相当于是一个死循环，不断重试
     while r is None:
         try:
-            r = requests.post(http_server_url, data=payload,timeout=(3, 5))
-        except r.HTTPError as e:
+            r = requests.post(http_server_url, data=payload,timeout=(2, 3))
+            print(r)
+        except Exception as e:
             print(f"[!] Exception caught: {e}")
-            time.sleep(5)
+            print("网络这块，啥都别说了，就无限制重复就好了，好多种错误，你能咋整？")
+            sleep(5)
     print(r.text)#这里应该是检查是否是200状态，如果是则返回True，然后下面写入local文件
 
 
@@ -145,10 +147,11 @@ def get_content_from_server():
     #这里相当于是一个死循环，不断重试
     while r is None:
         try:
-            r = requests.get(http_server_url,timeout=(3, 5))
-        except r.HTTPError as e:
+            r = requests.get(http_server_url,timeout=(2, 3))
+        except Exception as e:
             print(f"[!] Exception caught: {e}")
-            time.sleep(5)
+            print("网络这块，啥都别说了，就无限制重复就好了，好多种错误，你能咋整？")
+            sleep(5)
     res = r.text
     #print(r.text)
     #去掉返回的头和尾的双引号，真是烦人的一个库

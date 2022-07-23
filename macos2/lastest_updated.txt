@@ -1,3 +1,1 @@
-win.title("共享剪贴板程序")
-# Set the size of the window
-win.geometry("700x350")
+克隆的时候可以指定深度啊
