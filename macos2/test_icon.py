@@ -192,37 +192,35 @@ def if_diff():
 
 # 这个是主逻辑，从自己的mac程序test_checker2.py里面抄出来的，以后可以包装一个类，兼容三端
 def checker():
-   print("Hello World~~~")
-   #get a bytes,convert it to string
-   #https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
-   print("====Type of paste====")
-   print(pyclip.paste())
+    print("Hello World~~~")
+    #get a bytes,convert it to string
+    #https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
+    print("====Type of paste====")
+    print(type(pyclip.paste()))
+    if not isinstance(pyclip.paste(), int):
+        content = pyclip.paste().decode("utf-8")
+        content = content.replace("\r\n","\n")
+        print("I am in checker begging.....3 lines, I print out pyperclip.paste()'s result")
+        print(content)
+        write_to_local_post_buffter(content)
+        if if_diff_clipboard():
+            print("剪贴板内容与上一次远程上传的内容一致")
+            print("什么都不用做")
+            print("tick tick local nothing changes")
+        else:
+            post_to_server(content)
 
-   content = pyclip.paste().decode("utf-8")
-   content = content.replace("\r\n","\n")
-   print("I am in checker begging.....3 lines, I print out pyperclip.paste()'s result")
-   print(content)
-   write_to_local_post_buffter(content)
-   if if_diff_clipboard():
-      print("剪贴板内容与上一次远程上传的内容一致")
-      print("什么都不用做")
-      print("tick tick local nothing changes")
-   else:
-      post_to_server(content)
-
-   remote_clip_content = get_content_from_server()
-   if if_diff():
-      print("remote content equals local .....do nothing")
-   else:
-      print("更新本地剪切板")
-      pyclip.copy(remote_clip_content)
-      Fact = remote_clip_content
-      T.delete("1.0", "end")  # if you want to remove the old data
-      T.insert(END,Fact)
-
-   #注册下一次调用
-   #win.after(5000,lambda: checker())
-
+        remote_clip_content = get_content_from_server()
+        if if_diff():
+            print("remote content equals local .....do nothing")
+        else:
+            print("更新本地剪切板")
+            pyclip.copy(remote_clip_content)
+            Fact = remote_clip_content
+            T.delete("1.0", "end")  # if you want to remove the old data
+            T.insert(END,Fact)
+    else:
+        print("not a text pasted, pass ")
 
 # task that runs at a fixed interval
 def background_task(interval_sec):
